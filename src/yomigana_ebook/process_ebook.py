@@ -3,7 +3,8 @@ from typing import IO
 from zipfile import ZipFile, ZIP_DEFLATED
 from concurrent.futures import Future, ProcessPoolExecutor, as_completed
 
-from bs4 import BeautifulSoup, NavigableString, Tag, XMLParsedAsHTMLWarning
+from bs4 import BeautifulSoup, Tag, XMLParsedAsHTMLWarning
+from bs4.element import NavigableString
 from yomigana_ebook.yomituki import yomituki
 
 
@@ -35,7 +36,7 @@ def process_ebook(reader: IO[bytes], writer: IO[bytes]):
 
 
 def process_html(file: str, content: bytes):
-    soup = BeautifulSoup(content, "lxml")
+    soup = BeautifulSoup(content, features="xml")
 
     for child in soup.children:
         process_tag(child)  # type: ignore
