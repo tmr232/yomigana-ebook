@@ -4,7 +4,7 @@ from zipfile import ZipFile, ZIP_DEFLATED
 from concurrent.futures import Future, ProcessPoolExecutor, as_completed
 
 from bs4 import BeautifulSoup, Tag, XMLParsedAsHTMLWarning
-from bs4.element import NavigableString
+from bs4.element import NavigableString, PageElement
 from yomigana_ebook.yomituki import yomituki
 
 
@@ -39,22 +39,24 @@ def process_html(file: str, content: bytes):
     soup = BeautifulSoup(content, features="xml")
 
     for child in soup.children:
-        process_tag(child)  # type: ignore
+        process_tag(child)
 
     return file, soup.encode(formatter=None)  # type: ignore
 
 
-def process_tag(tag: Tag):
-    if tag.name == "ruby":
-        return
-
-    if type(tag) is NavigableString:
-        tag.replace_with("".join(yomituki(tag)))
-        return
-
-    if hasattr(tag, "children"):
-        for child in tag.children:
-            process_tag(child)  # type: ignore
+def process_tag(element: PageElement):
+    match element:
+        case Tag(name="ruby"):
+            return
+        case Tag(children=children):
+            for child in children:
+                process_tag(child)
+            return
+        case NavigableString():
+            element.replace_with("".join(yomituki(element)))
+            return
+        case _:
+            return
 
 
 def process_resources(file: str, content: bytes):
