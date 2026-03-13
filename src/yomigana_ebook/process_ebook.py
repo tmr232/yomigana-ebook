@@ -1,14 +1,12 @@
-from warnings import filterwarnings
 from typing import IO
 from zipfile import ZipFile, ZIP_DEFLATED
 from concurrent.futures import Future, ProcessPoolExecutor, as_completed
 
-from bs4 import BeautifulSoup, Tag, XMLParsedAsHTMLWarning
+from bs4 import BeautifulSoup, Tag
 from bs4.element import NavigableString, PageElement
 from yomigana_ebook.yomituki import yomituki
 
 
-filterwarnings("ignore", category=XMLParsedAsHTMLWarning, module="bs4")
 
 
 def process_ebook(reader: IO[bytes], writer: IO[bytes]):
