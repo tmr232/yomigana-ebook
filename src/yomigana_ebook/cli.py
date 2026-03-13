@@ -1,36 +1,39 @@
-from typing import List
-from argparse import ArgumentParser
-from os import path
+from pathlib import Path
 from time import time
+from typing import Annotated
+import typer
 
 from yomigana_ebook.process_ebook import process_ebook
 
-
-def main():
-    parser = ArgumentParser(
-        description="The fastest converter to add yomigana(readings) to Japanese epub eBooks! (Using Mecab and Unidic)"
-    )
-    parser.add_argument("ebook_paths", type=str, nargs="*")
-    args = parser.parse_args()
-
-    if args.ebook_paths:
-        process_ebooks(args.ebook_paths)
-        exit(0)
-
-    parser.print_help()
+app = typer.Typer()
 
 
-def process_ebooks(arg_paths: List[str]):
-    for arg_path in arg_paths:
-        file_path = path.abspath(arg_path)
-        file_dir = path.dirname(file_path)
-        file_name = path.basename(file_path)
-        output_path = path.join(file_dir, f"with-yomigana_{file_name}")
+@app.command()
+def main(
+    ebook_paths: list[Path],
+    force: Annotated[
+        bool, typer.Option("--force", "-f", help="Override existing outputs.")
+    ] = False,
+):
+    """The fastest converter to add yomigana(readings) to Japanese epub eBooks! (Using Mecab and Unidic)"""
 
-        with open(file_path, "rb") as f_reader, open(output_path, "wb") as f_writer:
+    process_ebooks(ebook_paths, force=force)
+
+
+def process_ebooks(input_paths: list[Path], force: bool = False):
+    for input_path in input_paths:
+        output_path = input_path.with_name(f"with-yomigana_{input_path.name}")
+
+        if not force and output_path.exists():
+            print(
+                f"Output already exists, skipping conversion. Use `--force` to override. {output_path}"
+            )
+            continue
+
+        with open(input_path, "rb") as f_reader, open(output_path, "wb") as f_writer:
             start_time = time()
             print()
-            print(f"[start] parsing the ebook: {file_path}")
+            print(f"[start] parsing the ebook: {input_path}")
 
             process_ebook(f_reader, f_writer)
 
@@ -41,4 +44,4 @@ def process_ebooks(arg_paths: List[str]):
 
 
 if __name__ == "__main__":
-    main()
+    app()
