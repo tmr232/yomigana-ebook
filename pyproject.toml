@@ -26,10 +26,10 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
-    "fugashi>=1.2.1,<2",
-    "unidic>=1.1.0,<2",
-    "beautifulsoup4>=4.12.2,<5",
-    "lxml>=4.9.2,<5",
+    "fugashi>=1.5.2",
+    "unidic>=1.1.0",
+    "beautifulsoup4>=4.14.3",
+    "lxml>=6.0.2",
 ]
 
 [project.urls]
@@ -41,11 +41,7 @@ yomigana_ebook = "yomigana_ebook.cli:main"
 
 [dependency-groups]
 dev = ["black>=23.3.0,<24"]
-test = [
-    "pytest>=7.3.1,<8",
-    "pytest-watcher>=0.2.6,<0.3",
-    "pytest-testmon>=2.0.6,<3",
-]
+test = ["pytest>=9.0.2", "pytest-watcher>=0.6.3", "pytest-testmon>=2.2.0"]
 
 [tool.uv]
 default-groups = "all"
